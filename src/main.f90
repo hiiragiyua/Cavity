@@ -144,11 +144,12 @@ subroutine set_bc_pressure(p)
   real(8),intent(inout) :: p(0:Nx, 0:Ny)
   integer ic,jc
 
+  
+  !p(1,1) = 0.d0 !fix a point
+
   do ic=1,Nx-1
      p(ic,0) = p(ic,1)
-  end do
-  do ic=1,Nx-1
-     p(ic,Ny)=p(ic,Ny-1)
+     p(ic,Ny)= p(ic,Ny-1)
   end do
 
   do jc=1,Ny-1
@@ -156,7 +157,6 @@ subroutine set_bc_pressure(p)
      p(Nx,jc) = p(Nx-1,jc)
   end do
 
-  !p(1,1) = 0.d0 !fix a point
 
 end subroutine set_bc_pressure
 
@@ -255,7 +255,6 @@ subroutine calcP(p,dive)
            d_pres = (  dy*dy*(p(ic-1,jc  ) + p(ic+1,jc  )) & 
                      + dx*dx*(p(ic  ,jc-1) + p(ic  ,jc+1)) &
                      - (dx*dx*dy*dy * dive(ic,jc)) )/((dx*dx+dy*dy)*2d0) - p(ic,jc)
-
            p(ic,jc) = p(ic,jc) + accel*d_pres
            err_n = err_n + d_pres*d_pres
            err_d = err_d + p(ic,jc)*p(ic,jc)
