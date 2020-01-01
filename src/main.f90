@@ -9,7 +9,7 @@ module parameters
   real(8), parameter :: Lx = 0.1d0
   real(8), parameter :: Ly = Lx
   integer, parameter :: Nx=41
-  integer, parameter :: Ny=41
+  integer, parameter :: Ny=43
 
   real(8), parameter :: accel = 1.925d0
   real(8), parameter :: err_tol = 1.0d-9
@@ -26,18 +26,18 @@ module parameters
   
 end module parameters
 
-module global_fw
+module global_fwd
   implicit none
   real(8),dimension(:),allocatable :: x,y
   real(8),dimension(:,:),allocatable :: u,v,p
   real(8),dimension(:,:),allocatable :: uaux,vaux,dive
   
-end module global_fw
+end module global_fwd
 
 program main
 
   use parameters, only: Nx,Ny,Nt,interval_w
-  use global_fw
+  use global_fwd
 
   implicit none
 
@@ -94,12 +94,12 @@ subroutine init(u,v,p)
 
   u=0.d0
   v=0.d0
-  call calc_bc_vel(u,v)
+  call set_bc_vel(u,v)
   p=0.d0
 
 end subroutine init
 
-subroutine calc_bc_vel(u,v)
+subroutine set_bc_vel(u,v)
 
   use parameters, only:Nx,Ny,Uwall
   implicit none
@@ -109,15 +109,18 @@ subroutine calc_bc_vel(u,v)
 
   integer i,j,ic,jc
 
+  ! left and right walls
   do jc=0,Ny-1
      u(1,jc) =0.d0
      u(Nx,jc)=0.d0
-     u(0,jc) = -u(2,jc)
-     u(Nx+1,jc) = -u(Nx-1,jc)
+     u(0,jc) = -u(2,jc) ! left imaginary cell
+     u(Nx+1,jc) = -u(Nx-1,jc) ! right imaginary cell
   end do
+  
+  ! bottom and top walls
   do i=0,Nx+1
-     u(i,0) = -u(i,0+1)
-     u(i,Ny) = -u(i,Ny-1)+2.d0*Uwall
+     u(i,0) = -u(i,0+1)  ! bottom wall (uc=0)
+     u(i,Ny) = -u(i,Ny-1)+2.d0*Uwall ! moving wall (uc=Uwall)
   end do
 
   do j=0,Ny+1
@@ -131,9 +134,9 @@ subroutine calc_bc_vel(u,v)
      v(ic,Ny+1) = -v(ic,Ny-1)
   end do
 
-end subroutine calc_bc_vel
+end subroutine set_bc_vel
 
-subroutine calc_bc_pressure(p)
+subroutine set_bc_pressure(p)
 
   use parameters, only:Nx,Ny
   implicit none
@@ -153,7 +156,9 @@ subroutine calc_bc_pressure(p)
      p(Nx,jc) = p(Nx-1,jc)
   end do
 
-end subroutine calc_bc_pressure
+  !p(1,1) = 0.d0 !fix a point
+
+end subroutine set_bc_pressure
 
 
 subroutine calcAuxVel(uaux,vaux,dive,u,v)
@@ -209,7 +214,7 @@ subroutine calcAuxVel(uaux,vaux,dive,u,v)
      end do
   end do
   
-  call calc_bc_vel(uaux,vaux)
+  call set_bc_vel(uaux,vaux)
 
   ! div. of p
   do jc=1,Ny-1
@@ -256,7 +261,7 @@ subroutine calcP(p,dive)
            err_d = err_d + p(ic,jc)*p(ic,jc)
         end do
      end do
-     call calc_bc_pressure(p)
+     call set_bc_pressure(p)
      
      if(err_d <= 1d-20) err_d = 1d0
      err_r = dsqrt(err_n/err_d)
@@ -291,14 +296,14 @@ subroutine correctVel(u,v,uaux,vaux,p)
   end do
 
   ! b.c.
-  call calc_bc_vel(u,v)
+  call set_bc_vel(u,v)
 
 end subroutine correctVel
 
 subroutine write_file_bin(ifile)
 
   use parameters
-  use global_fw
+  use global_fwd
   
   implicit none
 
@@ -310,7 +315,7 @@ subroutine write_file_bin(ifile)
 
   write(cext,'(i4.4)') ifile
   fileheader=trim(file_dir)//'fields_'//trim(cext)//'.txt'
-  filename=trim(file_dir)//'fields_'//trim(cext)//'.fw'
+  filename=trim(file_dir)//'fields_'//trim(cext)//'.fwd'
   !call write_file_txt(filename)  
 
   iout=34
@@ -329,6 +334,7 @@ subroutine write_file_bin(ifile)
   open(ifw,file=filename,form="unformatted")
   ! u
   write(ifw) u
+  !write(*,*) u(10,1), u(10,10), u(10,20), u(10,30), u(10,42)
   ! v
   write(ifw) v
   ! p
