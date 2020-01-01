@@ -20,7 +20,10 @@ module parameters
   real(8), parameter :: dt = ndt*dx/Uwall
   real(8), parameter :: endT=100
   integer, parameter :: Nt = int(endT*Lx/Uwall/dt)
-
+  
+  character*256, parameter :: file_dir='./pool/'
+  integer, parameter :: interval_w = 100
+  
 end module parameters
 
 module global_fw
@@ -33,13 +36,16 @@ end module global_fw
 
 program main
 
-  use parameters, only: Nx,Ny,Nt
+  use parameters, only: Nx,Ny,Nt,interval_w
   use global_fw
 
   implicit none
 
-  integer iter
+  integer iter, ifile
+  real(8) t1,t0
 
+  allocate (x(0:Nx+1),y(0:Ny+1))
+  
   allocate (u(0:Nx+1,0:Ny  ))
   allocate (v(0:Nx,  0:Ny+1))
   allocate (p(0:Nx,  0:Ny  ))
@@ -48,13 +54,24 @@ program main
   allocate (vaux(0:Nx,  0:Ny+1))
   allocate (dive(0:Nx,  0:Ny  ))
 
+  ifile=0
   call init(u,v,p)
-
+  call write_file_bin(ifile)
+  ifile=ifile+1
+  
   do iter=1,Nt
+     call cpu_time(t0)
      call calcAuxVel(uaux,vaux,dive,u,v)
      call calcP(p,dive)
      call correctVel(u,v,uaux,vaux,p)
-     if(mod(iter,100).eq.0) write(*,*) 'iter=',iter
+     call cpu_time(t1)
+     if(mod(iter,100).eq.0) then
+        write(*,*) 'iter=',iter, 'cpu time=',t1-t0
+     end if
+     if(mod(iter,interval_w).eq.0) then
+        call write_file_bin(ifile)
+        ifile=ifile+1
+     end if
   end do
 
   deallocate(dive)
@@ -64,6 +81,8 @@ program main
   deallocate(v)  
   deallocate(u)
 
+  deallocate(x,y)
+  
 end program main
 
 subroutine init(u,v,p)
@@ -138,8 +157,10 @@ end subroutine calc_bc_pressure
 
 
 subroutine calcAuxVel(uaux,vaux,dive,u,v)
+
   use parameters,only: Nx,Ny,dx,dy,dt,Uwall,Dens,Kvis
   implicit none
+
   real(8),intent(inout) :: uaux(0:Nx+1,0:Ny)
   real(8),intent(inout) :: vaux(0:Nx  ,0:Ny+1)
   real(8),intent(inout) :: dive(0:Nx  ,0:Ny)
@@ -273,3 +294,47 @@ subroutine correctVel(u,v,uaux,vaux,p)
   call calc_bc_vel(u,v)
 
 end subroutine correctVel
+
+subroutine write_file_bin(ifile)
+
+  use parameters
+  use global_fw
+  
+  implicit none
+
+  character*4 cext
+  character*256 filename,fileheader
+  integer,intent(in) :: ifile
+  
+  integer i,j,iout,ifw
+
+  write(cext,'(i4.4)') ifile
+  fileheader=trim(file_dir)//'fields_'//trim(cext)//'.txt'
+  filename=trim(file_dir)//'fields_'//trim(cext)//'.fw'
+  !call write_file_txt(filename)  
+
+  iout=34
+  ifw=35
+  open(iout,file=fileheader,form="formatted")
+  ! header
+  write(iout,*) '# ', trim(filename)
+  write(iout,*) '# Lx,Ly,Nx,Ny: ', Lx,Ly,Nx,Ny
+  write(iout,*) '# accel, err_tol: , ',accel, err_tol
+  write(iout,*) '# Uwall, Kvis, Dens: ', Uwall, Kvis, Dens
+  write(iout,*) '# ndt,endT: ', ndt, endT
+  write(iout,*) '# interval_w:', interval_w
+  write(iout,*) '# '
+  close(iout)
+
+  open(ifw,file=filename,form="unformatted")
+  ! u
+  write(ifw) u
+  ! v
+  write(ifw) v
+  ! p
+  write(ifw) p
+  !
+  close(ifw)
+  
+  
+end subroutine write_file_bin
