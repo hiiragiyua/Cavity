@@ -5,7 +5,7 @@ module parameters
   real(8), parameter :: Uwall =0.01d0
   real(8), parameter :: Kvis = 1.d-6
   real(8), parameter :: Dens = 1.d3
-  
+
   real(8), parameter :: Lx = 0.1d0
   real(8), parameter :: Ly = Lx
   integer, parameter :: Nx=41
@@ -13,17 +13,19 @@ module parameters
 
   real(8), parameter :: accel = 1.925d0
   real(8), parameter :: err_tol = 1.0d-9
+  real(8), parameter :: tiny = 1.0d-20
+
   real(8), parameter :: dx = Lx/dble(Nx-1)
   real(8), parameter :: dy = Lx/dble(Ny-1)
 
   real(8), parameter :: ndt = 0.1d0
   real(8), parameter :: dt = ndt*dx/Uwall
-  real(8), parameter :: endT=100
+  real(8), parameter :: endT=50
   integer, parameter :: Nt = int(endT*Lx/Uwall/dt)
-  
+
   character*256, parameter :: file_dir='./pool/'
   integer, parameter :: interval_w = 100
-  
+
 end module parameters
 
 module global_fwd
@@ -31,7 +33,7 @@ module global_fwd
   real(8),dimension(:),allocatable :: x,y
   real(8),dimension(:,:),allocatable :: u,v,p
   real(8),dimension(:,:),allocatable :: uaux,vaux,dive
-  
+
 end module global_fwd
 
 program main
@@ -45,7 +47,7 @@ program main
   real(8) t1,t0
 
   allocate (x(0:Nx+1),y(0:Ny+1))
-  
+
   allocate (u(0:Nx+1,0:Ny  ))
   allocate (v(0:Nx,  0:Ny+1))
   allocate (p(0:Nx,  0:Ny  ))
@@ -56,21 +58,22 @@ program main
 
   ifile=0
   call init(u,v,p)
-  call write_file_bin(ifile)
-  ifile=ifile+1
-  
+  call write_file_bin(ifile); ifile=ifile+1
+
   do iter=1,Nt
      call cpu_time(t0)
      call calcAuxVel(uaux,vaux,dive,u,v)
+
      call calcP(p,dive)
+
      call correctVel(u,v,uaux,vaux,p)
+
      call cpu_time(t1)
      if(mod(iter,100).eq.0) then
         write(*,*) 'iter=',iter, 'cpu time=',t1-t0
      end if
      if(mod(iter,interval_w).eq.0) then
-        call write_file_bin(ifile)
-        ifile=ifile+1
+        call write_file_bin(ifile); ifile=ifile+1
      end if
   end do
 
@@ -78,16 +81,16 @@ program main
   deallocate(p)
   deallocate(vaux)
   deallocate(uaux)
-  deallocate(v)  
+  deallocate(v)
   deallocate(u)
 
   deallocate(x,y)
-  
+
 end program main
 
 subroutine init(u,v,p)
   use parameters, only:Nx,Ny
-  implicit none 
+  implicit none
   real(8), intent(inout) :: u(0:Nx+1,0:Ny)
   real(8), intent(inout) :: v(0:Nx  ,0:Ny+1)
   real(8), intent(inout) :: p(0:Nx  ,0:Ny)
@@ -116,7 +119,7 @@ subroutine set_bc_vel(u,v)
      u(0,jc) = -u(2,jc) ! left imaginary cell
      u(Nx+1,jc) = -u(Nx-1,jc) ! right imaginary cell
   end do
-  
+
   ! bottom and top walls
   do i=0,Nx+1
      u(i,0) = -u(i,0+1)  ! bottom wall (uc=0)
@@ -144,7 +147,7 @@ subroutine set_bc_pressure(p)
   real(8),intent(inout) :: p(0:Nx, 0:Ny)
   integer ic,jc
 
-  
+
   !p(1,1) = 0.d0 !fix a point
 
   do ic=1,Nx-1
@@ -178,17 +181,17 @@ subroutine calcAuxVel(uaux,vaux,dive,u,v)
 
   do jc=1,Ny-1
      do i=1,Nx
-        visc = (u(i-1,jc  )-2d0*u(i,jc)+u(i+1,jc  ))/(dx*dx) & 
-              +(u(i  ,jc-1)-2d0*u(i,jc)+u(i  ,jc+1))/(dy*dy) 
+        visc = (u(i-1,jc  )-2d0*u(i,jc)+u(i+1,jc  ))/(dx*dx) &
+              +(u(i  ,jc-1)-2d0*u(i,jc)+u(i  ,jc+1))/(dy*dy)
 
-        conv = (+( ( u(i-1,jc)+u(i  ,jc))/2d0 & 
+        conv = (+( ( u(i-1,jc)+u(i  ,jc))/2d0 &
                   *(-u(i-1,jc)+u(i  ,jc))/dx )&
                 +( ( u(i,  jc)+u(i+1,jc))/2d0 &
                   *(-u(i,  jc)+u(i+1,jc))/dx )&
-               )/2d0 & 
-              +(+( ( v(i-1,jc  )+v(i  ,jc  ))/2d0 & 
-                  *(-u(i  ,jc-1)+u(i  ,jc  ))/dy )& 
-                +( ( v(i-1,jc+1)+v(i  ,jc+1))/2d0 & 
+               )/2d0 &
+              +(+( ( v(i-1,jc  )+v(i  ,jc  ))/2d0 &
+                  *(-u(i  ,jc-1)+u(i  ,jc  ))/dy )&
+                +( ( v(i-1,jc+1)+v(i  ,jc+1))/2d0 &
                   *(-u(i  ,jc  )+u(i  ,jc+1))/dy )&
                )/2d0
         uaux(i,jc) = u(i,jc) + dt*(-conv + Kvis*visc)
@@ -197,23 +200,23 @@ subroutine calcAuxVel(uaux,vaux,dive,u,v)
 
   do j=1,Ny
      do ic=1,Nx-1
-        visc = (v(ic-1,j  )-2d0*v(ic,j)+v(ic+1,j  ))/(dx*dx) & 
-              +(v(ic  ,j-1)-2d0*v(ic,j)+v(ic  ,j+1))/(dy*dy) 
- 
-        conv = (+( ( u(ic  ,j-1)+u(ic  ,j))/2d0 & 
+        visc = (v(ic-1,j  )-2d0*v(ic,j)+v(ic+1,j  ))/(dx*dx) &
+              +(v(ic  ,j-1)-2d0*v(ic,j)+v(ic  ,j+1))/(dy*dy)
+
+        conv = (+( ( u(ic  ,j-1)+u(ic  ,j))/2d0 &
                   *(-v(ic-1,j  )+v(ic  ,j))/dx )&
                 +( ( u(ic+1,j-1)+u(ic+1,j))/2d0 &
                   *(-v(ic  ,j  )+v(ic+1,j))/dx )&
-               )/2d0 & 
-              +(+( ( v(ic,j-1)+v(ic  ,j  ))/2d0 & 
-                  *(-v(ic,j-1)+v(ic  ,j  ))/dy )& 
-                +( ( v(ic,j  )+v(ic  ,j+1))/2d0 & 
+               )/2d0 &
+              +(+( ( v(ic,j-1)+v(ic  ,j  ))/2d0 &
+                  *(-v(ic,j-1)+v(ic  ,j  ))/dy )&
+                +( ( v(ic,j  )+v(ic  ,j+1))/2d0 &
                   *(-v(ic,j  )+v(ic  ,j+1))/dy )&
                )/2d0
         vaux(ic,j) = v(ic,j) + dt*(-conv + Kvis*visc)
      end do
   end do
-  
+
   call set_bc_vel(uaux,vaux)
 
   ! div. of p
@@ -225,12 +228,11 @@ subroutine calcAuxVel(uaux,vaux,dive,u,v)
      end do
   end do
 
-
 end subroutine calcAuxVel
 
 subroutine calcP(p,dive)
 
-  use parameters,only: Nx,Ny,dx,dy,dt,Uwall,Dens,err_tol,accel
+  use parameters,only: Nx,Ny,dx,dy,dt,Uwall,Dens,err_tol,accel,tiny
   implicit none
 
   real(8),intent(inout) :: p(0:Nx,0:Ny)
@@ -252,7 +254,7 @@ subroutine calcP(p,dive)
 
      do jc=1,Ny-1
         do ic=1,Nx-1
-           d_pres = (  dy*dy*(p(ic-1,jc  ) + p(ic+1,jc  )) & 
+           d_pres = (  dy*dy*(p(ic-1,jc  ) + p(ic+1,jc  )) &
                      + dx*dx*(p(ic  ,jc-1) + p(ic  ,jc+1)) &
                      - (dx*dx*dy*dy * dive(ic,jc)) )/((dx*dx+dy*dy)*2d0) - p(ic,jc)
            p(ic,jc) = p(ic,jc) + accel*d_pres
@@ -261,8 +263,8 @@ subroutine calcP(p,dive)
         end do
      end do
      call set_bc_pressure(p)
-     
-     if(err_d <= 1d-20) err_d = 1d0
+
+     if(err_d <= tiny) err_d = 1d0
      err_r = dsqrt(err_n/err_d)
 
   end do
@@ -303,22 +305,21 @@ subroutine write_file_bin(ifile)
 
   use parameters
   use global_fwd
-  
+
   implicit none
 
   character*4 cext
   character*256 filename,fileheader
   integer,intent(in) :: ifile
-  
+
   integer i,j,iout,ifw
 
   write(cext,'(i4.4)') ifile
   fileheader=trim(file_dir)//'fields_'//trim(cext)//'.txt'
   filename=trim(file_dir)//'fields_'//trim(cext)//'.fwd'
-  !call write_file_txt(filename)  
-
+  !call write_file_txt(filename)
+  ! write a parameter file
   iout=34
-  ifw=35
   open(iout,file=fileheader,form="formatted")
   ! header
   write(iout,*) '# ', trim(filename)
@@ -329,17 +330,17 @@ subroutine write_file_bin(ifile)
   write(iout,*) '# interval_w:', interval_w
   write(iout,*) '# '
   close(iout)
-
+  ! write fortran binary
+  ifw=35
   open(ifw,file=filename,form="unformatted")
   ! u
   write(ifw) u
-  !write(*,*) u(10,1), u(10,10), u(10,20), u(10,30), u(10,42)
   ! v
   write(ifw) v
   ! p
   write(ifw) p
   !
   close(ifw)
-  
-  
+
+
 end subroutine write_file_bin
