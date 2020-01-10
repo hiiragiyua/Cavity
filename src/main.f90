@@ -342,5 +342,4 @@ subroutine write_file_bin(ifile)
   !
   close(ifw)
 
-
 end subroutine write_file_bin

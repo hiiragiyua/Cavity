@@ -1,0 +1,12 @@
+# --- before plot you have to run the cavity code. 
+[1] compile the main1.f90 in ./src
+[2] run the cavity fortran code in ./run/pool 
+[3] this script plot the ***.fwd files.   
+
+# --- please download anaconda3 (see HowToPython_anaconda.pdf) 
+#
+[1] open plot_fields.ipynb with jupyter-notebook. 
+ $jupyter-notebook plot_fields.ipynb
+[2] set case parameter (number of grids, etc.)  as in icase==1 
+[3] run the note-book cell by "shift+Enter"
+
