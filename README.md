@@ -9,9 +9,15 @@
 Fortran コードで実行 --> 出力されたFortranバイナリファイルを Pythonスクリプトで読み込み --> 流線を可視化．   
 
     $cp ./src/main.f90 ./run/
+
+コンパイルと実行
     $cd ./run
     $gfortran main.f90
     $./a.out 
+
+pythonスクリプトで可視化
+    $cd ./script/ 
+    $jupyter-notebook plot_fields.ipynb
 
 ## 使い方 2 
 Pythonコードをjupyter-notebookで実行 (Fortranより計算が遅い)
