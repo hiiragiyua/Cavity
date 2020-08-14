@@ -5,6 +5,14 @@
 ここでは各プログラムファイルについて，簡単に説明．  
 （このプログラムには他人の著作物のコピーが含まれるので，多数に公開するときには注意して下さい．）  
 
+自習項目  
+- Linuxコマンドの基礎 (cd, mkdir, ls, cp, rm など)
+- エディター(Vim, Emacs, Atomなど)の使い方 
+- Fortranでのコンパイルなど 
+
+とりあえずpythonのみで動かして見たい人は, 使い方2へ　　
+
+
 ## 使い方 1  
 ./run フォルダ内でFortranコードをコンパイル・実行  --> ./pool/ に出力されたFortranバイナリファイルをPythonスクリプトで読み込み  --> 流線を可視化．   
 という手順です．
@@ -25,9 +33,9 @@
     $cd ./script/
     $jupyter-notebook plot_fields.ipynb
 ```
-## 使い方 2 (Fortranを使わずにとりあえず実行してみたい人向け) 
+## 使い方 2 (Fortranやコマンド操作を使わずにとりあえず実行してみたい人向け) 
 Pythonコードをjupyter-notebookで実行 (Fortranより計算が遅い)
 ```
     $cd ./python
-    $jupyther-notebook 000_cavity_vel_pressure.ipynb
+    $jupyter-notebook 000_cavity_vel_pressure.ipynb
 ```
