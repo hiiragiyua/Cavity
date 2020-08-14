@@ -11,11 +11,13 @@ Fortran コードで実行 --> 出力されたFortranバイナリファイルを
     $cp ./src/main.f90 ./run/
 
 コンパイルと実行
+
     $cd ./run
     $gfortran main.f90
     $./a.out 
 
 pythonスクリプトで可視化
+
     $cd ./script/ 
     $jupyter-notebook plot_fields.ipynb
 
