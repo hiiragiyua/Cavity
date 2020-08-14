@@ -11,18 +11,18 @@ Fortran コードで実行 --> 出力されたFortranバイナリファイルを
 ---
 1. まずソースプログラムのコピーをrunフォルダにコピー
 
-    $cp ./src/main.f90 ./run/
+    $cp ./src/main.f90 ./run/  
 
 2. コンパイルと実行 (main.f90の中にパラメターが書かれているので， パラメターを変更するたびにコンパイルして， 実行する．)
 
-    $cd ./run
-    $gfortran main.f90
-    $./a.out 
+    $cd ./run    
+    $gfortran main.f90  
+    $./a.out  
 
 3. pythonスクリプトで可視化 (2の実行時に出力される時系列ファイルをpythonで読み込んでいます． エンディアン(littleかbig)とFortran特有のバイトレコードマーカーに注意します． また， データは倍精度(8byte)で書き出されています．)
 
-    $cd ./script/ 
-    $jupyter-notebook plot_fields.ipynb
+    $cd ./script/   
+    $jupyter-notebook plot_fields.ipynb  
 
 ## 使い方 2 
 Pythonコードをjupyter-notebookで実行 (Fortranより計算が遅い)
