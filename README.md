@@ -34,7 +34,8 @@
     $jupyter-notebook plot_fields.ipynb
 ```
 ## 使い方 2 (Fortranやコマンド操作を使わずにとりあえず実行してみたい人向け) 
-Pythonコードをjupyter-notebookで実行 (Fortranより計算が遅い)
+000_cavity_vel_pressure.ipynb を jupyter-notebookで実行してください(Fortranより計算が遅い).    
+ターミナルからは以下．
 ```
     $cd ./python
     $jupyter-notebook 000_cavity_vel_pressure.ipynb
