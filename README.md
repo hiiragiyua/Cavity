@@ -1,9 +1,10 @@
-# cavity code
+# cavity code (化工演習I 2020年度版)
 ## 2D cavity flow simulation using fractional step method 
 
 キャビティ流れについては[カマキリさんのサイト](https://takun-physics.net/10217/)などで調べて下さい．  
 ここでは各プログラムファイルについて，簡単に説明．  
-（このプログラムには他人の著作物のコピーが含まれるので，多数に公開するときには注意して下さい．）  
+現状のプログラムには他人の著作物のコピーが一部含まれるので， 他人に公開するときには注意して下さい． 
+ (参考)「暗黙の型宣言」  https://note.com/implicit_none）  
 
 自習項目  
 - Linuxコマンドの基礎 (cd, mkdir, ls, cp, rm など)
