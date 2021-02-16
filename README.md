@@ -31,7 +31,7 @@
 ```
 3. pythonスクリプトで可視化 (2の実行時に出力される時系列ファイルをpythonで読み込んでいます． エンディアン(littleかbig)とFortran特有のバイトレコードマーカーに注意します． また， データは倍精度(8byte)で書き出されています．)
 ```
-    $cd ./script/
+    $cd ./scripts/
     $jupyter-notebook plot_fields.ipynb
 ```
 ## 使い方 2 (Fortranやコマンド操作を使わずにとりあえず実行してみたい人向け) 
