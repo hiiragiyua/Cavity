@@ -1,4 +1,4 @@
-# cavity code (演習I 2020年度版)
+# cavity code (演習I 2021年度版)
 ## 2D cavity flow simulation using fractional step method 
 
 キャビティ流れについては[カマキリさんのサイト](https://takun-physics.net/10217/)などで調べて下さい．  
@@ -34,7 +34,7 @@
     $cd ./scripts/
     $jupyter-notebook plot_fields.ipynb
 ```
-## 使い方 2 (Fortranやコマンド操作を使わずにとりあえず実行してみたい人向け) 
+## 使い方 2 jupyter-notebookを使って，python上で計算から可視化まで行う． (Fortranやコマンド操作を使わずに, とりあえず実行してみたい人向け) 
 000_cavity_vel_pressure.ipynb を jupyter-notebookで実行してください(Fortranより計算が遅い).    
 ターミナルからは以下．
 ```
