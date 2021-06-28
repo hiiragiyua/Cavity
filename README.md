@@ -14,7 +14,7 @@
 とりあえずpythonのみで動かして見たい人は, 使い方2へ　　
 
 
-## 使い方 1  
+## 使い方 1 （計算の実行はFortranで, 図の可視化はpython または Matlabで行う．) 
 ./run フォルダ内でFortranコードをコンパイル・実行  --> ./pool/ に出力されたFortranバイナリファイルをPythonスクリプトで読み込み  --> 流線を可視化．   
 という手順です．
 
@@ -34,7 +34,7 @@
     $cd ./scripts/
     $jupyter-notebook plot_fields.ipynb
 ```
-## 使い方 2 jupyter-notebookを使って，python上で計算から可視化まで行う． (Fortranやコマンド操作を使わずに, とりあえず実行してみたい人向け) 
+## 使い方 2 (jupyter-notebookを使って，python上で計算から可視化まで行う．Fortranやコマンド操作を使わずに, とりあえず実行してみたい人向け) 
 000_cavity_vel_pressure.ipynb を jupyter-notebookで実行してください(Fortranより計算が遅い).    
 ターミナルからは以下．
 ```
