@@ -35,6 +35,7 @@
     $jupyter-notebook plot_fields.ipynb
 ```
 ## 使い方 2 (jupyter-notebookを使って，python上で計算から可視化まで行う．Fortranやコマンド操作を使わずに, とりあえず実行してみたい人向け) 
+2021/06/28 浮力項の追加． (左壁面加熱，右壁面冷却) 
 000_cavity_vel_pressure.ipynb を jupyter-notebookで実行してください(Fortranより計算が遅い).    
 ターミナルからは以下．
 ```
