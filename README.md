@@ -1,4 +1,4 @@
-# cavity code (演習I 2021年度版)
+# cavity code (演習用)
 ## 2D cavity flow simulation using fractional step method 
 
 キャビティ流れについては[カマキリさんのサイト](https://takun-physics.net/10217/)などで調べて下さい．  
