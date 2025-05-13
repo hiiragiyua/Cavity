@@ -20,19 +20,20 @@
 
 1. まずソースプログラムのコピーをrunフォルダにコピー
 ```    
-    $cp ./src/main.f90 ./run/
-    $mkdir ./run/pool/ 
+    cp ./src/main.f90 ./run/
+    mkdir ./run/pool/ 
 ```
 2. コンパイルと実行 (main.f90の中にパラメターが書かれているので， パラメターを変更するたびにコンパイルして， 実行する． ./pool/フォルダに書き出されます． ./poolフォルダを作成していない場合はエラーが出ます．上書き注意．)
 ```
-    $cd ./run
-    $gfortran main.f90
-    $./a.out
+    cd ./run
+    gfortran main.f90
+    ./a.out
 ```
 3. pythonスクリプトで可視化 (2の実行時に出力される時系列ファイルをpythonで読み込んでいます． エンディアン(littleかbig)とFortran特有のバイトレコードマーカーに注意します． また， データは倍精度(8byte)で書き出されています．)
 ```
-    $cd ./scripts/
-    $jupyter-notebook plot_fields.ipynb
+    cd ./scripts/
+    jupyter-notebook plot_fields.ipynb
+    jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace plot_fields.ipynb
 ```
 ## 使い方 2 (jupyter-notebookを使って，python上で計算から可視化まで行う．Fortranやコマンド操作を使わずに, とりあえず実行してみたい人向け) 
 
