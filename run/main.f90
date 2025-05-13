@@ -2,7 +2,7 @@
 ! central difference, Euler, SOR
 module parameters
   implicit none
-  real(8), parameter :: Uwall =0.01d0
+  real(8), parameter :: Uwall =0.1d0
   real(8), parameter :: Kvis = 1.d-6
   real(8), parameter :: Dens = 1.d3
 
